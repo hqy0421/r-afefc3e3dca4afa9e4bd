@@ -1,6 +1,14 @@
 Release History
 ===============
 
+Unreleased
+----------
+
+* Add ``Worksheet.migration_preview``: build a read-only migration plan for
+  moving columns to another worksheet of the same spreadsheet with unchanged
+  row numbers, original cell types preserved, A1 formula references remapped
+  and ``MigrationPlanError`` raised when a reference cannot be mapped safely.
+
 6.2.1 (2025-05-14)
 ------------------
 

@@ -14,4 +14,5 @@ The models represent common spreadsheet entities: :class:`a spreadsheet <gspread
 
    spreadsheet
    worksheet
+   migration
    cell

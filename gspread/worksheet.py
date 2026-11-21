@@ -32,6 +32,7 @@ from typing import (
 from .cell import Cell
 from .exceptions import GSpreadException
 from .http_client import DefaultSerializerType, HTTPClient, ParamsType
+from .migration import MigrationPlan, build_migration_preview
 from .urls import WORKSHEET_DRIVE_URL
 from .utils import (
     DateTimeOption,
@@ -1104,6 +1105,69 @@ class Worksheet:
         )
 
         return [ValueRange.from_json(x) for x in response["valueRanges"]]
+
+    def migration_preview(
+        self,
+        destination_title: str,
+        column_mapping: Mapping[Any, Any],
+        source_range: str,
+    ) -> MigrationPlan:
+        """Build a *preview* of a column migration to another worksheet.
+
+        The selected columns of ``source_range`` are planned for the worksheet
+        titled ``destination_title`` in the same spreadsheet. Row numbers are
+        kept unchanged. This method only performs read-only API calls and
+        returns a :class:`~gspread.migration.MigrationPlan`; it never writes,
+        clears or deletes anything.
+
+        Cell types are read from the raw grid data and preserved: plain text,
+        numbers, booleans, error values, blanks and formulas are kept distinct,
+        including literal text that starts with ``=`` (which is not turned into
+        a formula).
+
+        Formulas are rewritten according to ``column_mapping``:
+
+        * unqualified A1 references and references explicitly pointing at this
+          worksheet are mapped to the destination columns;
+        * references to other worksheets, named ranges and text inside string
+          literals are left untouched;
+        * ``$`` absolute markers are preserved;
+        * finite rectangular references must stay contiguous and ordered after
+          mapping. Missing columns, split or reversed ranges, open-ended
+          references and dynamic references (``INDIRECT`` / ``OFFSET``) make
+          the whole preview fail, with every offending source formula cell
+          reported in :class:`~gspread.migration.MigrationPlanError`.
+
+        :param str destination_title: title of the destination worksheet in
+            the same spreadsheet
+        :param dict column_mapping: mapping of source columns to destination
+            columns; keys and values may be column letters (``"C"``) or
+            1-based column indexes (``3``)
+        :param str source_range: finite A1 range to migrate, e.g.
+            ``"A1:F20"``
+        :rtype: :class:`gspread.migration.MigrationPlan`
+
+        Example::
+
+            plan = worksheet.migration_preview(
+                destination_title="New template",
+                column_mapping={"A": 1, "C": 2, "F": 3},
+                source_range="A1:F100",
+            )
+            # review the plan, then apply it:
+            for group in plan.batch_groups:
+                new_worksheet.batch_update(
+                    group.data, value_input_option=group.value_input_option
+                )
+
+        .. versionadded:: 6.3.0
+        """
+        return build_migration_preview(
+            worksheet=self,
+            destination_title=destination_title,
+            column_mapping=column_mapping,
+            source_range=source_range,
+        )
 
     def update(
         self,

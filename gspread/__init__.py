@@ -22,6 +22,15 @@ from .exceptions import (
     WorksheetNotFound,
 )
 from .http_client import BackOffHTTPClient, HTTPClient
+from .migration import (
+    CELL_TYPE_BLANK,
+    CELL_TYPE_ERROR,
+    CELL_TYPE_FORMULA,
+    CELL_TYPE_FORMULA_LIKE_TEXT,
+    CELL_TYPE_VALUE,
+    MigrationPlan,
+    MigrationPlanError,
+)
 from .spreadsheet import Spreadsheet
 from .worksheet import ValueRange, Worksheet
 
@@ -36,31 +45,32 @@ __all__ = [
     "oauth_from_dict",
     "service_account",
     "service_account_from_dict",
-
     # from .cell
     "Cell",
-
     # from .client
     "Client",
-
     # from .http_client
     "BackOffHTTPClient",
     "HTTPClient",
-
     # from .spreadsheet
     "Spreadsheet",
-
     # from .worksheet
     "Worksheet",
     "ValueRange",
-
     # from .exceptions
     "GSpreadException",
     "IncorrectCellLabel",
     "NoValidUrlKeyFound",
     "SpreadsheetNotFound",
     "WorksheetNotFound",
-
+    # from .migration
+    "MigrationPlan",
+    "MigrationPlanError",
+    "CELL_TYPE_VALUE",
+    "CELL_TYPE_FORMULA",
+    "CELL_TYPE_FORMULA_LIKE_TEXT",
+    "CELL_TYPE_BLANK",
+    "CELL_TYPE_ERROR",
     # full module imports
     "urls",
     "utils",
